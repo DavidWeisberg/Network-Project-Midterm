@@ -62,8 +62,6 @@ int main()
     bufferLine[i] = buffer[i];
   }
   printf("%s:\t%s\n", inet_ntoa(cliaddr.sin_addr), bufferLine);//IP address
-  errcode = write(connectfd, buffer, sizeof(buffer));
-  errCheck(errcode);
   errcode = close(connectfd);
     errCheck(errcode);
   }
