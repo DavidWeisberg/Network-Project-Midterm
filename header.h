@@ -13,6 +13,6 @@
 #include <string.h>
 #include <netdb.h>
 
-#define MAXLEN 1024
+#define MAXLEN 5000
 
 #endif

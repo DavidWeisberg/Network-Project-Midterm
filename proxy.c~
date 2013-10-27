@@ -77,33 +77,58 @@ int main()
         }
       }
     }
-  printf("%s\n", bufferLine); //Check/print host
+  printf("%s", bufferLine); //Check/print host - this is just to test.
+  
+  /*//Trying getaddrinfo also doesn't work...
+  struct addrinfo hints, *res;
+  struct sockaddr_in *ipv4Addr;
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;//IPv4 & IPv6
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_CANONNAME;
+  errcode = getaddrinfo(bufferLine, NULL, &hints, &res);
+  if(errcode != 0)
+  {
+    perror("Error");
+    exit(errcode);
+  }
+  
+  ipv4Addr = (struct sockaddr_in *) res->ai_addr;
+  //inet_ntop(res->ai_family, &ipv4Addr->sin_addr, addrstr, INET6_ADDRSTRLEN);
+  servaddr.sin_addr.s_addr = ipv4Addr->sin_addr.s_addr;
+  */
   
   //After this i'm trying to connect to host, which is in bufferLine. This doesn't work.
-  /*
+
   struct hostent *he;
   if ( (he = gethostbyname(bufferLine) ) == NULL )//This is an outdated function, I should use getaddrinfo() 
   {
+      printf("0.1\n"); // Problem is getting hostname
       exit(1);
   }
   
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  errCheck(sockfd);
+
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(80);
-  memcpy(&servaddr.sin_addr, he->h_addr_list[0], he->h_length);
-   
+  servaddr.sin_addr.s_addr = (*(long *)he->h_addr);
+  
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  errCheck(sockfd);  
+  printf("1\n");
   errcode = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
   errCheck(errcode);
+  printf("2\n");
   errcode = write(sockfd, buffer, sizeof(buffer));
   errCheck(errcode);
+  printf("3\n");
   errcode = read(sockfd, buffer, MAXLEN);
   errCheck(errcode);
-  printf("%s\n", buffer);
+  printf("%s\n\n", buffer);
+  printf("LOOK UP\n");
 
   errcode = close(sockfd);
   errCheck(sockfd);
-  */
+  
   errcode = close(connectfd);
   errCheck(errcode);
   }
