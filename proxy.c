@@ -24,7 +24,7 @@ int main()
   
   listenaddr.sin_family = AF_INET;
   listenaddr.sin_addr.s_addr = htonl(INADDR_ANY);//Any address
-  listenaddr.sin_port = htons(9735);//Any port CHANGE THIS TO 0
+  listenaddr.sin_port = htons(0);//Any port CHANGE THIS TO 0
   
   //BIND
   errcode = bind(listenfd, (struct sockaddr *) &listenaddr, sizeof(listenaddr));
@@ -77,10 +77,10 @@ int main()
         }
       }
     }
-  printf("%s", bufferLine); //Check/print host - this is just to test.
+  //printf("%s", bufferLine); //Check/print host - this is just to test.
   
-  sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  errCheck(sockfd); 
+  //sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  //errCheck(sockfd); 
   
   /*//Trying getaddrinfo also doesn't work...
   struct addrinfo hints, *res;
@@ -102,7 +102,7 @@ int main()
   */
   
   //After this i'm trying to connect to host, which is in bufferLine. This doesn't work.
-
+/*
   struct hostent *he;
   if ( (he = gethostbyname(bufferLine) ) == NULL )//This is an outdated function, I should use getaddrinfo() 
   {
@@ -113,7 +113,8 @@ int main()
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(80);
   servaddr.sin_addr.s_addr = (*(long *)he->h_addr);
-  
+  */
+  /*
   printf("1\n");
   errcode = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
   errCheck(errcode);
@@ -125,10 +126,10 @@ int main()
   errCheck(errcode);
   printf("%s\n\n", buffer);
   printf("LOOK UP\n");
-
+  
   errcode = close(sockfd);
   errCheck(sockfd);
-  
+  */
   errcode = close(connectfd);
   errCheck(errcode);
   }

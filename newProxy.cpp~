@@ -50,7 +50,7 @@ int bind_port()
 
        addr.sin_family = AF_INET;
 
-       addr.sin_port = htons( 0 );//Change to 0 for any address
+       addr.sin_port = htons( 9735 );//Change to 0 for any address
 
        addr.sin_addr.s_addr = htonl(INADDR_ANY);;
 
