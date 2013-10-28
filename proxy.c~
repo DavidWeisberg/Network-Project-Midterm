@@ -141,6 +141,8 @@ int main()
     //ACCEPT
     clilen = sizeof(cliaddr);
     connectfd = accept(listenfd, (struct sockaddr *) &cliaddr, &clilen);
+    printf("Got a connection from %s on port %d\n", 
+                    inet_ntoa(cliaddr.sin_addr), htons(cliaddr.sin_port));
     errCheck(connectfd);
     
     //Display Request - WIP
