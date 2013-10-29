@@ -1,4 +1,100 @@
-#include "header.h"
+//Borrowed but unused code taken from http://martinbroadhurst.com/source/tcpproxy.c.html
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include <strings.h>
+#include <unistd.h>
+#include <string.h>
+#include <netdb.h>
+
+#define MAXLEN 5000
+
+/*
+unsigned int transfer(int from, int to)//Borrowed code
+{
+    char buf[MAXLEN];
+    unsigned int disconnected = 0;
+    size_t bytes_read, bytes_written;
+    bytes_read = read(from, buf, MAXLEN);
+    printf("%s\n", buf);
+    if (bytes_read == 0) {
+        disconnected = 1;
+    }
+    else {
+        bytes_written = write(to, buf, bytes_read);
+        if (bytes_written == -1) {
+            disconnected = 1;
+        }
+    }
+    return disconnected;
+}
+
+void handle(int client, char *host, char *port)//Borrowed code
+{
+    struct addrinfo hints, *res;
+    int server = -1;
+    unsigned int disconnected = 0;
+    fd_set set;
+    unsigned int max_sock;
+    // Get the address info 
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    if (getaddrinfo("www.google.com", "80", &hints, &res) != 0) {
+        perror("getaddrinfo");
+        close(client);
+        return;
+    }
+
+    // Create the socket 
+    server = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (server == -1) {
+        perror("socket");
+        close(client);
+        return;
+    }
+
+    // Connect to the host 
+    if (connect(server, res->ai_addr, res->ai_addrlen) == -1) {
+        perror("connect");
+        close(client);
+        return;
+    }
+
+    if (client > server) {
+        max_sock = client;
+    }
+    else {
+        max_sock = server;
+    }
+
+    // Main transfer loop 
+    while (!disconnected) {
+        FD_ZERO(&set);
+        FD_SET(client, &set);
+        FD_SET(server, &set);
+        if (select(max_sock + 1, &set, NULL, NULL, NULL) == -1) {
+            perror("select");
+            break;
+        }
+        if (FD_ISSET(client, &set)) {
+            disconnected = transfer(client, server);
+        }
+        if (FD_ISSET(server, &set)) {
+            disconnected = transfer(server, client);
+        }
+    }
+    close(server);
+    close(client);
+}
+*/
+
+
+
 
 void errCheck(int err)
 {
@@ -11,9 +107,8 @@ void errCheck(int err)
 
 int main()
 {
-  int listenfd, connectfd, sockfd, errcode, n, i;
-  int loop = 1;
-  struct sockaddr_in cliaddr, listenaddr, servaddr;
+  int listenfd, connectfd, webfd, errcode, n, i;
+  struct sockaddr_in listenaddr, cliaddr, webaddr;
   socklen_t clilen;
   char buffer[MAXLEN];
   char bufferLine[MAXLEN];
@@ -24,7 +119,7 @@ int main()
   
   listenaddr.sin_family = AF_INET;
   listenaddr.sin_addr.s_addr = htonl(INADDR_ANY);//Any address
-  listenaddr.sin_port = htons(0);//Any port CHANGE THIS TO 0
+  listenaddr.sin_port = htons(9735);//Any port CHANGE THIS TO 0
   
   //BIND
   errcode = bind(listenfd, (struct sockaddr *) &listenaddr, sizeof(listenaddr));
@@ -41,7 +136,7 @@ int main()
   printf("%d\n", ntohs(listenaddr.sin_port));
 
 
-  while(loop)
+  while(1)
   {
     //ACCEPT
     clilen = sizeof(cliaddr);
@@ -62,6 +157,7 @@ int main()
     }
     printf("%s:\t%s\n", inet_ntoa(cliaddr.sin_addr), bufferLine);//IP address
     
+    /*//My crappy way of trying to get host
     memset(&bufferLine, 0, MAXLEN);
     for(i=0; i < MAXLEN; i++)
     {
@@ -77,10 +173,13 @@ int main()
         }
       }
     }
+*/
+    
+    
   //printf("%s", bufferLine); //Check/print host - this is just to test.
   
-  //sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  //errCheck(sockfd); 
+  //webfd = socket(AF_INET, SOCK_STREAM, 0);
+  //errCheck(webfd); 
   
   /*//Trying getaddrinfo also doesn't work...
   struct addrinfo hints, *res;
@@ -98,7 +197,7 @@ int main()
   
   ipv4Addr = (struct sockaddr_in *) res->ai_addr;
   //inet_ntop(res->ai_family, &ipv4Addr->sin_addr, addrstr, INET6_ADDRSTRLEN);
-  servaddr.sin_addr.s_addr = ipv4Addr->sin_addr.s_addr;
+  webaddr.sin_addr.s_addr = ipv4Addr->sin_addr.s_addr;
   */
   
   //After this i'm trying to connect to host, which is in bufferLine. This doesn't work.
@@ -110,32 +209,32 @@ int main()
       exit(1);
   } 
 
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(80);
-  servaddr.sin_addr.s_addr = (*(long *)he->h_addr);
+  webaddr.sin_family = AF_INET;
+  webaddr.sin_port = htons(80);
+  webaddr.sin_addr.s_addr = (*(long *)he->h_addr);
   */
   /*
   printf("1\n");
-  errcode = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+  errcode = connect(webfd, (struct sockaddr *) &webaddr, sizeof(webaddr));
   errCheck(errcode);
   printf("2\n");
-  errcode = write(sockfd, buffer, sizeof(buffer));
+  errcode = write(webfd, buffer, sizeof(buffer));
   errCheck(errcode);
   printf("3\n");
-  errcode = read(sockfd, buffer, MAXLEN);
+  errcode = read(webfd, buffer, MAXLEN);
   errCheck(errcode);
   printf("%s\n\n", buffer);
   printf("LOOK UP\n");
   
-  errcode = close(sockfd);
-  errCheck(sockfd);
+  errcode = close(webfd);
+  errCheck(webfd);
   */
   errcode = close(connectfd);
   errCheck(errcode);
   }
 
     //CLOSE
-    errcode = close(sockfd);
+    errcode = close(webfd);
     errCheck(errcode);
     errcode = close(connectfd);
     errCheck(errcode);
