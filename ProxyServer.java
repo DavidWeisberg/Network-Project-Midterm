@@ -29,7 +29,7 @@ public class ProxyServer {
     public static void main(String[] args) {
 
         try {
-            ServerSocket serverSocket = new ServerSocket(9735); // TODO change port number 9735 to 0
+            ServerSocket serverSocket = new ServerSocket(0); // Sets port #
 
             System.out.println(serverSocket.getLocalPort());    // Display port number
 
